@@ -22,7 +22,7 @@ export default function Sidebar() {
             <ul className="flex flex-col gap-4">
               <li>
                 <a
-                  href="Dashboard"
+                  href="dashboard"
                   className="flex items-center gap-4 hover:bg-blue-500 hover:text-white p-3 rounded-md "
                 >
                   <LayoutDashboard /> Dashboard
