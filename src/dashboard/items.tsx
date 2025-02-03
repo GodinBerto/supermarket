@@ -4,18 +4,17 @@ import { FaMedal } from "react-icons/fa";
 
 import { Edit3, MoreVertical, Trash2 } from "lucide-react";
 import Popup from "../components/popup";
-import React from "react";
 
 export default function Item() {
-  const [employees, setEmployees] = useState([]);
+  const [employees, _setEmployees] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState([]);
-  const [successMessage, setSuccessMessage] = useState("");
+  const [successMessage, _setSuccessMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [popup, setPopup] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [currentEmployeeId, setCurrentEmployeeId] = useState("");
+  const [_currentEmployeeId, setCurrentEmployeeId] = useState("");
   const [newEmployee, setNewEmployee] = useState({
     name: "",
     email: "",
@@ -227,7 +226,7 @@ function Medal({
   closeModal,
   handleInputChange,
   handleSaveEmployee,
-  newEmployee,
+  // newEmployee,
   isUpdating,
 }: any) {
   return (

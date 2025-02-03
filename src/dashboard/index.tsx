@@ -4,8 +4,8 @@ import Cards from "../components/cards";
 import BarChart from "../components/barchart";
 
 export default function Dashboard() {
-  const [employees, setEmployees] = useState([]);
-  const [salaryData, setSalaryData] = useState<{
+  const [employees, _setEmployees] = useState([]);
+  const [salaryData, _setSalaryData] = useState<{
     labels: string[];
     values: number[];
   }>({
@@ -31,20 +31,20 @@ export default function Dashboard() {
     try {
       //   const data = await getMonthlySalaryTotals();
       // Prepare the data for the chart
-      const labels = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ];
+      // const labels = [
+      //   "January",
+      //   "February",
+      //   "March",
+      //   "April",
+      //   "May",
+      //   "June",
+      //   "July",
+      //   "August",
+      //   "September",
+      //   "October",
+      //   "November",
+      //   "December",
+      // ];
       //   setSalaryData({
       //     labels,
       //     // values: data.monthlySalaries,
@@ -54,10 +54,10 @@ export default function Dashboard() {
     }
   };
 
-  const [totalEmployees, setTotalEmployees] = useState(0);
-  const [activeEmployees, setActiveEmployees] = useState(0);
-  const [totalSalary, setTotalSalary] = useState(0);
-  const [onLeave, setOnLeave] = useState(0);
+  const [totalEmployees, _setTotalEmployees] = useState(0);
+  const [activeEmployees, _setActiveEmployees] = useState(0);
+  const [totalSalary, _setTotalSalary] = useState(0);
+  const [onLeave, _setOnLeave] = useState(0);
 
   useEffect(() => {
     // Fetch total number of employees
