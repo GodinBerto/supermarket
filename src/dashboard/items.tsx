@@ -6,16 +6,16 @@ import { Edit3, MoreVertical, Trash2 } from "lucide-react";
 import Popup from "../components/popup";
 
 export default function Item() {
-  const [employees, _setEmployees] = useState([]);
+  const [items, setItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredEmployees, setFilteredEmployees] = useState([]);
-  const [successMessage, _setSuccessMessage] = useState("");
+  const [filteredItems, setFilteredItems] = useState([]);
+  const [successMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [popup, setPopup] = useState(false);
-  const [employeeToDelete, setEmployeeToDelete] = useState(null);
+  const [itemToDelete, setitemToDelete] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [_currentEmployeeId, setCurrentEmployeeId] = useState("");
-  const [newEmployee, setNewEmployee] = useState({
+  const [, setCurrentitemId] = useState("");
+  const [newitem, setNewitem] = useState({
     name: "",
     email: "",
     phone: "",
@@ -24,86 +24,105 @@ export default function Item() {
   });
 
   useEffect(() => {
-    fetchEmployees();
+    fetchItems();
   }, []);
 
-  const fetchEmployees = async () => {
+  const fetchItems = async () => {
     try {
-      //   const data = await getAllEmployees();
-      //   setEmployees(data);
-      //   setFilteredEmployees(data);
+      const response = await fetch("http://127.0.0.1:8000/api/v1/items/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setItems(data.data); // <-- Ensure items state is updated
+        setFilteredItems(data.data); // <-- This initializes filtered items
+      } else {
+        console.error("Error fetching items:", data.error);
+      }
     } catch (error) {
-      console.error("Error fetching employees:", error);
+      console.error("Error fetching items:", error);
     }
   };
-
-  const handleAddEmployee = async () => {
+  const handleAdditem = async () => {
     try {
-      //   await addEmployee(newEmployee);
-      //   setSuccessMessage("Employee added successfully! 🎉");
-      //   fetchEmployees();
+      const response = await fetch("http://127.0.0.1:8000/api/v1/items/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setItems(data.data); // <-- Ensure items state is updated
+        setFilteredItems(data.data); // <-- This initializes filtered items
+      } else {
+        console.error("Error fetching items:", data.error);
+      }
       closeModal();
     } catch (error) {
-      console.error("Error adding employee:", error);
+      console.error("Error adding item:", error);
     }
   };
 
-  const handleOpenUpdateModal = (employee: any) => {
-    setNewEmployee(employee);
-    setCurrentEmployeeId(employee.id);
+  const handleOpenUpdateModal = (item: any) => {
+    setNewitem(item);
+    setCurrentitemId(item.id);
     setIsUpdating(true);
     setIsModalOpen(true);
   };
 
-  const handleUpdateEmployee = async () => {
+  const handleUpdateitem = async () => {
     try {
-      //   await updateEmployee(currentEmployeeId, newEmployee);
-      //   setSuccessMessage("Employee updated successfully! 🏅");
-      //   fetchEmployees();
+      //   await updateitem(currentitemId, newitem);
+      //   setSuccessMessage("item updated successfully! 🏅");
+      //   fetchitems();
       closeModal();
     } catch (error) {
-      console.error("Error updating employee:", error);
+      console.error("Error updating item:", error);
     }
   };
 
-  const handleDeleteEmployee = async () => {
+  const handleDeleteitem = async () => {
     try {
-      if (employeeToDelete) {
-        // await deleteEmployee(employeeToDelete);
-        // setSuccessMessage("Employee deleted successfully! 🏅");
-        // fetchEmployees();
+      if (itemToDelete) {
+        // await deleteitem(itemToDelete);
+        // setSuccessMessage("item deleted successfully! 🏅");
+        // fetchitems();
         closePopup();
       }
     } catch (error) {
-      console.error("Error deleting employee:", error);
+      console.error("Error deleting item:", error);
     }
   };
 
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
-    setNewEmployee((prev) => ({ ...prev, [name]: value }));
+    setNewitem((prev) => ({ ...prev, [name]: value }));
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setIsUpdating(false);
-    setNewEmployee({ name: "", email: "", phone: "", salary: "", status: "" });
+    setNewitem({ name: "", email: "", phone: "", salary: "", status: "" });
   };
 
   const closePopup = () => {
     setPopup(false);
-    setEmployeeToDelete(null);
+    setitemToDelete(null);
   };
 
-  // Filter employees based on the search term
+  // Filter items based on the search term
   useEffect(() => {
-    const results = employees.filter(
-      (employee: any) =>
-        employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        employee.email.toLowerCase().includes(searchTerm.toLowerCase())
+    const results = items.filter(
+      (item: any) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.category?.toLowerCase().includes(searchTerm.toLowerCase()) // <-- Ensures no error
     );
-    setFilteredEmployees(results);
-  }, [searchTerm, employees]);
+    setFilteredItems(results);
+  }, [searchTerm, items]);
 
   return (
     <div>
@@ -111,10 +130,8 @@ export default function Item() {
         <Medal
           closeModal={closeModal}
           handleInputChange={handleInputChange}
-          handleSaveEmployee={
-            isUpdating ? handleUpdateEmployee : handleAddEmployee
-          }
-          newEmployee={newEmployee}
+          handleSaveitem={isUpdating ? handleUpdateitem : handleAdditem}
+          newitem={newitem}
           isUpdating={isUpdating}
         />
       )}
@@ -122,10 +139,10 @@ export default function Item() {
       {popup && (
         <Popup
           title={"Delete"}
-          text={"Are you sure you want to delete this employee?"}
+          text={"Are you sure you want to delete this item?"}
           buttonText={"Delete"}
           buttonColor={"red"}
-          handleOnClick={handleDeleteEmployee}
+          handleOnClick={handleDeleteitem}
           closePopup={closePopup}
         />
       )}
@@ -165,27 +182,29 @@ export default function Item() {
                 <th className="px-4 py-2 font-semibold ">CATEGORY</th>
                 <th className="px-4 py-2 font-semibold ">MANUFACTURE DATE</th>
                 <th className="px-4 py-2 font-semibold ">EXPIRY DATE</th>
-                <th className="px-4 py-2 font-semibold ">SUPPLIER</th>
-                <th className="px-4 py-2 font-semibold ">CUSTOMER</th>
+                {/* <th className="px-4 py-2 font-semibold ">SUPPLIER</th>
+                <th className="px-4 py-2 font-semibold ">CUSTOMER</th> */}
+                <th className="px-4 py-2 font-semibold ">ACTIONS</th>
               </tr>
             </thead>
             <tbody>
-              {filteredEmployees.length > 0 ? (
-                filteredEmployees.map((employee: any, index) => (
-                  <tr className="hover:bg-blue-50" key={employee.id}>
+              {filteredItems.length > 0 ? (
+                filteredItems.map((item: any, index) => (
+                  <tr className="hover:bg-blue-50" key={item.id}>
                     <td className="px-4 py-2">{index + 1}</td>
-                    <td className="px-4 py-2">{employee.name}</td>
-                    <td className="px-4 py-2">{employee.email}</td>
-                    <td className="px-4 py-2">{employee.phone}</td>
-                    <td className="px-4 py-2">${employee.salary}</td>
-                    <td className="px-4 py-2">${employee.salary}</td>
-                    <td className="px-4 py-2">${employee.salary}</td>
-                    <td className="px-4 py-2">${employee.salary}</td>
+                    <td className="px-4 py-2">{item.name}</td>
+                    <td className="px-4 py-2">{item.price}</td>
+                    <td className="px-4 py-2">{item.stock_quantity}</td>
+                    <td className="px-4 py-2">{item.category}</td>
+                    <td className="px-4 py-2">{item.manufacture_date}</td>
+                    <td className="px-4 py-2">{item.expiry_date}</td>
+                    {/* <td className="px-4 py-2">{item.supplier}</td>
+                    <td className="px-4 py-2">{item.customer}</td> */}
 
                     <td className="px-4 py-2 flex gap-3">
                       <button
                         className="flex items-center text-white p-[4px] bg-blue-500 rounded-md"
-                        onClick={() => handleOpenUpdateModal(employee)}
+                        onClick={() => handleOpenUpdateModal(item)}
                       >
                         <Edit3 size={20} />
                       </button>
@@ -193,7 +212,7 @@ export default function Item() {
                         className="flex items-center text-white p-[4px] bg-red-500 rounded-md"
                         onClick={() => {
                           setPopup(true);
-                          setEmployeeToDelete(employee.id);
+                          setitemToDelete(item.id);
                         }}
                       >
                         <Trash2 size={20} />
@@ -225,8 +244,8 @@ export default function Item() {
 function Medal({
   closeModal,
   handleInputChange,
-  handleSaveEmployee,
-  // newEmployee,
+  handleSaveitem,
+  // newitem,
   isUpdating,
 }: any) {
   return (
@@ -372,7 +391,7 @@ function Medal({
             Cancel
           </button>
           <button
-            onClick={handleSaveEmployee}
+            onClick={handleSaveitem}
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
           >
             {isUpdating ? "Update" : "Save"}
