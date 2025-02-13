@@ -1,26 +1,31 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import Container from "../components/content-container";
 import { FaMedal } from "react-icons/fa";
 
-import { Edit3, MoreVertical, Trash2 } from "lucide-react";
+import { Edit3, Trash2 } from "lucide-react";
 import Popup from "../components/popup";
+import { ItemsTypes } from "../../types";
+import { MoreModal } from "../components/more_modal";
 
 export default function Item() {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState<ItemsTypes[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredItems, setFilteredItems] = useState([]);
-  const [successMessage] = useState("");
+  const [filteredItems, setFilteredItems] = useState<ItemsTypes[]>([]);
+  const [successMessage, setSuccessMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [popup, setPopup] = useState(false);
   const [itemToDelete, setitemToDelete] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [, setCurrentitemId] = useState("");
+  const [currentItemId, setCurrentitemId] = useState(null);
+  const [selectedItem, setSelectedItem] = useState<ItemsTypes | null>(null);
   const [newitem, setNewitem] = useState({
+    id: "",
     name: "",
-    email: "",
-    phone: "",
-    salary: "",
-    status: "",
+    stock_quantity: "",
+    category: "",
+    supplier_name: "",
+    description: "",
   });
 
   useEffect(() => {
@@ -46,6 +51,7 @@ export default function Item() {
       console.error("Error fetching items:", error);
     }
   };
+
   const handleAdditem = async () => {
     try {
       const response = await fetch("http://127.0.0.1:8000/api/v1/items/", {
@@ -53,46 +59,140 @@ export default function Item() {
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify(newitem), // <-- Send new item data
       });
+
       const data = await response.json();
       if (response.ok) {
-        setItems(data.data); // <-- Ensure items state is updated
-        setFilteredItems(data.data); // <-- This initializes filtered items
+        setItems((prevItems) => [...prevItems, data.data]); // <-- Append new item
+        setFilteredItems((prevItems) => [...prevItems, data.data]);
+        setSuccessMessage("item added successfully! 🏅");
       } else {
-        console.error("Error fetching items:", data.error);
+        console.error("Error adding item:", data.error);
       }
+
       closeModal();
     } catch (error) {
       console.error("Error adding item:", error);
     }
   };
 
-  const handleOpenUpdateModal = (item: any) => {
-    setNewitem(item);
-    setCurrentitemId(item.id);
+  const handleOpenUpdateModal = (item: ItemsTypes) => {
+    setNewitem(item); // Populate the modal fields with item details
+    setCurrentitemId(item.id); // Set the ID correctly
     setIsUpdating(true);
     setIsModalOpen(true);
   };
 
-  const handleUpdateitem = async () => {
+  /*************  ✨ Codeium Command ⭐  *************/
+  /**
+ * Fetches an item by its ID from the server and updates the state with the fetched data.
+ * 
+ * @param {number} id - The unique identifier of the item to be fetched.
+ * 
+/******  3aab10f0-117e-4b35-abba-10bba25e7ff3  *******/
+  const handleFetchItem = async (id: number) => {
+    if (!id) {
+      console.error("Item ID is required for updating.");
+      return;
+    }
+
     try {
-      //   await updateitem(currentitemId, newitem);
-      //   setSuccessMessage("item updated successfully! 🏅");
-      //   fetchitems();
-      closeModal();
+      const getItemResponse = await fetch(
+        `http://127.0.0.1:8000/api/v1/items/id=${id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const dataFetched = await getItemResponse.json();
+
+      if (getItemResponse.ok) {
+        setNewitem(dataFetched.data); // Populate inputs
+      } else {
+        console.error("Error fetching item:", dataFetched.error);
+      }
+    } catch (error) {
+      console.error("Error fetching item:", error);
+    }
+  };
+
+  const handleUpdateItem = async () => {
+    if (!currentItemId) {
+      console.error("Item ID is required for updating.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/v1/items/id=${currentItemId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newitem), // Use updated state
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setItems((prevItems) =>
+          prevItems.map((item) =>
+            item.id === Number(newitem.id) ? data.data : item
+          )
+        );
+        setFilteredItems((prevItems) =>
+          prevItems.map((item) =>
+            item.id === Number(newitem.id) ? data.data : item
+          )
+        );
+        setSuccessMessage("Item updated successfully! 🏅");
+        closeModal();
+      } else {
+        console.error("Error updating item:", data.error);
+      }
     } catch (error) {
       console.error("Error updating item:", error);
     }
   };
 
   const handleDeleteitem = async () => {
+    if (!itemToDelete) {
+      console.error("Item ID is required for deletion.");
+      return;
+    }
+
     try {
-      if (itemToDelete) {
-        // await deleteitem(itemToDelete);
-        // setSuccessMessage("item deleted successfully! 🏅");
-        // fetchitems();
-        closePopup();
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/v1/items/id=${itemToDelete}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        setItems((prevItems) =>
+          prevItems.filter((item) => item.id !== itemToDelete)
+        );
+        setFilteredItems((prevItems) =>
+          prevItems.filter((item) => item.id !== itemToDelete)
+        );
+
+        setSuccessMessage("Item deleted successfully! 🏅");
+      } else {
+        const data = await response.json();
+        console.error("Error deleting item:", data.error);
       }
+
+      // closePopup();
     } catch (error) {
       console.error("Error deleting item:", error);
     }
@@ -106,7 +206,14 @@ export default function Item() {
   const closeModal = () => {
     setIsModalOpen(false);
     setIsUpdating(false);
-    setNewitem({ name: "", email: "", phone: "", salary: "", status: "" });
+    setNewitem({
+      id: "",
+      name: "",
+      stock_quantity: "",
+      category: "",
+      supplier_name: "",
+      description: "",
+    });
   };
 
   const closePopup = () => {
@@ -117,12 +224,22 @@ export default function Item() {
   // Filter items based on the search term
   useEffect(() => {
     const results = items.filter(
-      (item: any) =>
+      (item: ItemsTypes) =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.category?.toLowerCase().includes(searchTerm.toLowerCase()) // <-- Ensures no error
     );
     setFilteredItems(results);
   }, [searchTerm, items]);
+
+  const onDoubleClick = (item: ItemsTypes) => {
+    setSelectedItem({
+      name: item.name,
+      stock_quantity: item.stock_quantity,
+      category: item.category,
+      supplier_name: item.supplier_name,
+      discription: item.discription,
+    });
+  };
 
   return (
     <div>
@@ -130,9 +247,16 @@ export default function Item() {
         <Medal
           closeModal={closeModal}
           handleInputChange={handleInputChange}
-          handleSaveitem={isUpdating ? handleUpdateitem : handleAdditem}
+          handleSaveitem={isUpdating ? handleUpdateItem : handleAdditem}
           newitem={newitem}
           isUpdating={isUpdating}
+        />
+      )}
+
+      {selectedItem && (
+        <MoreModal
+          details={selectedItem}
+          closeModal={() => setSelectedItem(null)}
         />
       )}
 
@@ -177,34 +301,38 @@ export default function Item() {
               <tr className="bg-blue-100 text-left">
                 <th className="px-4 py-2 font-semibold ">ID</th>
                 <th className="px-4 py-2 font-semibold ">ITEM NAME</th>
-                <th className="px-4 py-2 font-semibold ">PRICE</th>
+
                 <th className="px-4 py-2 font-semibold ">QUANTITY</th>
                 <th className="px-4 py-2 font-semibold ">CATEGORY</th>
-                <th className="px-4 py-2 font-semibold ">MANUFACTURE DATE</th>
-                <th className="px-4 py-2 font-semibold ">EXPIRY DATE</th>
-                {/* <th className="px-4 py-2 font-semibold ">SUPPLIER</th>
-                <th className="px-4 py-2 font-semibold ">CUSTOMER</th> */}
+
+                <th className="px-4 py-2 font-semibold ">SUPPLIER</th>
+
                 <th className="px-4 py-2 font-semibold ">ACTIONS</th>
               </tr>
             </thead>
             <tbody>
               {filteredItems.length > 0 ? (
-                filteredItems.map((item: any, index) => (
-                  <tr className="hover:bg-blue-50" key={item.id}>
+                filteredItems.map((item: ItemsTypes, index) => (
+                  <tr
+                    className="hover:bg-blue-50"
+                    key={item.id}
+                    onDoubleClick={onDoubleClick.bind(null, item)}
+                  >
                     <td className="px-4 py-2">{index + 1}</td>
                     <td className="px-4 py-2">{item.name}</td>
-                    <td className="px-4 py-2">{item.price}</td>
+
                     <td className="px-4 py-2">{item.stock_quantity}</td>
                     <td className="px-4 py-2">{item.category}</td>
-                    <td className="px-4 py-2">{item.manufacture_date}</td>
-                    <td className="px-4 py-2">{item.expiry_date}</td>
-                    {/* <td className="px-4 py-2">{item.supplier}</td>
-                    <td className="px-4 py-2">{item.customer}</td> */}
+
+                    <td className="px-4 py-2">{item.supplier_name}</td>
 
                     <td className="px-4 py-2 flex gap-3">
                       <button
                         className="flex items-center text-white p-[4px] bg-blue-500 rounded-md"
-                        onClick={() => handleOpenUpdateModal(item)}
+                        onClick={() => {
+                          handleOpenUpdateModal(item);
+                          handleFetchItem(item.id as number);
+                        }}
                       >
                         <Edit3 size={20} />
                       </button>
@@ -217,12 +345,12 @@ export default function Item() {
                       >
                         <Trash2 size={20} />
                       </button>
-                      <button
+                      {/* <button
                         className="text-gray-500 hover:text-blue-500"
                         onClick={() => {}}
                       >
                         <MoreVertical size={20} />
-                      </button>
+                      </button> */}
                     </td>
                   </tr>
                 ))
@@ -245,7 +373,7 @@ function Medal({
   closeModal,
   handleInputChange,
   handleSaveitem,
-  // newitem,
+  newitem,
   isUpdating,
 }: any) {
   return (
@@ -269,43 +397,28 @@ function Medal({
             </label>
             <input
               type="text"
-              name={"item_name"}
-              id={"item_name"}
+              name={"name"}
+              id={"name"}
               onChange={handleInputChange}
               className="border-2 border-gray-300 p-2 rounded-md outline-blue-500"
               placeholder="John Doe"
+              value={newitem.name}
             />
           </div>
 
-          <div className="flex gap-2 justify-between">
-            <div className="flex flex-col gap-[1px]">
-              <label htmlFor="expiry_date" className="text-gray-500 text-sm">
-                Quantity
-              </label>
-              <input
-                type="number"
-                name={"quantity"}
-                id={"quantity"}
-                onChange={handleInputChange}
-                className="border-2 border-gray-300 p-2 rounded-md outline-blue-500"
-                placeholder="10"
-              />
-            </div>
-            <div>
-              <div className="flex flex-col gap-[1px]">
-                <label htmlFor="expiry_date" className="text-gray-500 text-sm">
-                  Price (Ghs)
-                </label>
-                <input
-                  type="number"
-                  name={"price"}
-                  id={"price"}
-                  onChange={handleInputChange}
-                  className="border-2 border-gray-300 p-2 rounded-md outline-blue-500"
-                  placeholder="100"
-                />
-              </div>
-            </div>
+          <div className="flex flex-col gap-[1px]">
+            <label htmlFor="expiry_date" className="text-gray-500 text-sm">
+              Quantity
+            </label>
+            <input
+              type="number"
+              name={"stock_quantity"}
+              id={"stock_quantity"}
+              onChange={handleInputChange}
+              className="border-2 border-gray-300 p-2 rounded-md outline-blue-500"
+              placeholder="10"
+              value={newitem.stock_quantity}
+            />
           </div>
 
           <div className="flex flex-col">
@@ -318,12 +431,14 @@ function Medal({
               onChange={handleInputChange}
               className="border-2 border-gray-300 p-2 rounded-md outline-blue-500"
             >
-              <option value="">Select Category</option>
+              <option value="">
+                {newitem.category ? newitem.category : "Select Category"}
+              </option>
               <option value="Drinks">Drinks</option>
             </select>
           </div>
 
-          <div className="flex gap-2 justify-between">
+          {/* <div className="flex gap-2 justify-between">
             <div className="flex flex-col flex-1">
               <label
                 htmlFor="manufacture_date"
@@ -351,7 +466,7 @@ function Medal({
                 className="border-2 border-gray-300 p-2 rounded-md outline-blue-500 w-full"
               />
             </div>
-          </div>
+          </div> */}
 
           <div className="flex flex-col gap-[1px]">
             <label htmlFor="expiry_date" className="text-gray-500 text-sm">
@@ -359,11 +474,12 @@ function Medal({
             </label>
             <input
               type="text"
-              name={"supplier"}
-              id={"supplier"}
+              name={"supplier_name"}
+              id={"supplier_name"}
               onChange={handleInputChange}
               className="border-2 border-gray-300 p-2 rounded-md outline-blue-500"
               placeholder="Super Market Ltd"
+              value={newitem.supplier_name}
             />
           </div>
 
@@ -379,6 +495,7 @@ function Medal({
               onChange={handleInputChange}
               className="border-2 border-gray-300 p-2 rounded-md outline-blue-500"
               placeholder="Enter a brief description..."
+              value={newitem.description}
             ></textarea>
           </div>
         </div>

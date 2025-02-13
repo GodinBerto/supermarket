@@ -1,10 +1,10 @@
 import {
+  BuildingIcon,
   ChartBarStacked,
   Layers,
   LayoutDashboard,
   LogOut,
   Logs,
-  ShoppingBag,
   UsersRound,
 } from "lucide-react";
 
@@ -51,17 +51,8 @@ export default function Sidebar() {
                   href="items"
                   className="flex items-center gap-4 hover:bg-blue-500 hover:text-white p-3 rounded-md"
                 >
-                  <UsersRound />
-                  Suppliers
-                </a>
-              </li>
-              <li>
-                <a
-                  href="items"
-                  className="flex items-center gap-4 hover:bg-blue-500 hover:text-white p-3 rounded-md"
-                >
-                  <ShoppingBag />
-                  Customers
+                  <BuildingIcon />
+                  Department
                 </a>
               </li>
               <li>
@@ -71,6 +62,15 @@ export default function Sidebar() {
                 >
                   <Logs />
                   Logs
+                </a>
+              </li>
+              <li>
+                <a
+                  href="items"
+                  className="flex items-center gap-4 hover:bg-blue-500 hover:text-white p-3 rounded-md"
+                >
+                  <UsersRound />
+                  Users
                 </a>
               </li>
             </ul>
