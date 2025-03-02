@@ -5,7 +5,7 @@ import { FaMedal } from "react-icons/fa";
 
 import { Edit3, Trash2 } from "lucide-react";
 import Popup from "../components/popup";
-import { ItemsTypes } from "../../types";
+import { CategoriesTypes, DepartmentsTypes, ItemsTypes } from "../../types";
 import { MoreModal } from "../components/more_modal";
 
 export default function Item() {
@@ -15,7 +15,7 @@ export default function Item() {
   const [successMessage, setSuccessMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [popup, setPopup] = useState(false);
-  const [itemToDelete, setitemToDelete] = useState(null);
+  const [itemToDelete, setitemToDelete] = useState<number>(0);
   const [isUpdating, setIsUpdating] = useState(false);
   const [currentItemId, setCurrentitemId] = useState(null);
   const [selectedItem, setSelectedItem] = useState<ItemsTypes | null>(null);
@@ -24,6 +24,7 @@ export default function Item() {
     name: "",
     stock_quantity: "",
     category: "",
+    department: "",
     supplier_name: "",
     description: "",
   });
@@ -77,7 +78,7 @@ export default function Item() {
     }
   };
 
-  const handleOpenUpdateModal = (item: ItemsTypes) => {
+  const handleOpenUpdateModal = (item: any) => {
     setNewitem(item); // Populate the modal fields with item details
     setCurrentitemId(item.id); // Set the ID correctly
     setIsUpdating(true);
@@ -186,6 +187,7 @@ export default function Item() {
           prevItems.filter((item) => item.id !== itemToDelete)
         );
 
+        setPopup(false);
         setSuccessMessage("Item deleted successfully! 🏅");
       } else {
         const data = await response.json();
@@ -213,19 +215,20 @@ export default function Item() {
       category: "",
       supplier_name: "",
       description: "",
+      department: "",
     });
   };
 
   const closePopup = () => {
     setPopup(false);
-    setitemToDelete(null);
+    setitemToDelete(0);
   };
 
   // Filter items based on the search term
   useEffect(() => {
     const results = items.filter(
       (item: ItemsTypes) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.category?.toLowerCase().includes(searchTerm.toLowerCase()) // <-- Ensures no error
     );
     setFilteredItems(results);
@@ -237,9 +240,16 @@ export default function Item() {
       stock_quantity: item.stock_quantity,
       category: item.category,
       supplier_name: item.supplier_name,
-      discription: item.discription,
+      department: item.department,
+      description: item.description,
     });
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
+  }, [successMessage]);
 
   return (
     <div>
@@ -331,7 +341,7 @@ export default function Item() {
                         className="flex items-center text-white p-[4px] bg-blue-500 rounded-md"
                         onClick={() => {
                           handleOpenUpdateModal(item);
-                          handleFetchItem(item.id as number);
+                          handleFetchItem(item.id || 0);
                         }}
                       >
                         <Edit3 size={20} />
@@ -340,7 +350,7 @@ export default function Item() {
                         className="flex items-center text-white p-[4px] bg-red-500 rounded-md"
                         onClick={() => {
                           setPopup(true);
-                          setitemToDelete(item.id);
+                          setitemToDelete(item.id || 0);
                         }}
                       >
                         <Trash2 size={20} />
@@ -376,6 +386,54 @@ function Medal({
   newitem,
   isUpdating,
 }: any) {
+  const [departments, setDepartments] = useState([]);
+  const [categories, setcategories] = useState([]);
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/v1/departments/",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setDepartments(data.data); // <-- Ensure Departments state is updated
+      } else {
+        console.error("Error fetching departments:", data.error);
+      }
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/v1/categories/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setcategories(data.data); // <-- Ensure categories state is updated
+      } else {
+        console.error("Error fetching categories:", data.error);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDepartments();
+    fetchCategories();
+  }, []);
   return (
     <div className="bg-black/30 absolute w-screen h-screen z-10 flex justify-center items-center">
       <div className="bg-white p-6 rounded-md shadow-md shadow-black/30">
@@ -434,7 +492,30 @@ function Medal({
               <option value="">
                 {newitem.category ? newitem.category : "Select Category"}
               </option>
-              <option value="Drinks">Drinks</option>
+              {categories.map((categories: CategoriesTypes) => (
+                <option key={categories.id} value={categories.name}>
+                  {categories.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex flex-col">
+            <label className="text-gray-500 text-sm">Department</label>
+            <select
+              name="department"
+              id="department"
+              onChange={handleInputChange}
+              className="border-2 border-gray-300 p-2 rounded-md outline-blue-500"
+              value={newitem.department}
+            >
+              <option value="">
+                {newitem.department || "Select Department"}
+              </option>
+              {departments.map((dept: DepartmentsTypes) => (
+                <option key={dept.id} value={dept.name}>
+                  {dept.name}
+                </option>
+              ))}
             </select>
           </div>
 

@@ -21,13 +21,13 @@ ChartJS.register(
   Legend
 );
 
-const LineChart = ({ className, salaryData }: any) => {
+const LineChart = ({ className, itemData }: any) => {
   const data = {
-    labels: salaryData.labels, // Dynamic labels from salaryData
+    labels: itemData.labels, // Dynamic labels from salaryData
     datasets: [
       {
-        label: "Salaries",
-        data: salaryData.values, // Dynamic salary values from salaryData
+        label: "Items",
+        data: itemData.values, // Dynamic salary values from salaryData
         backgroundColor: "rgba(75, 192, 192, 0.5)",
         borderColor: "rgba(75, 192, 192, 1)",
         borderWidth: 3,
@@ -54,7 +54,7 @@ const LineChart = ({ className, salaryData }: any) => {
       },
       title: {
         display: true,
-        text: "Employee Salary Data",
+        text: "Items Data",
         font: {
           size: 20,
         },
@@ -83,6 +83,9 @@ const LineChart = ({ className, salaryData }: any) => {
       },
     },
   };
+  if (!itemData.labels.length) {
+    return <p className="text-center text-gray-500">No data available</p>;
+  }
 
   return <Line data={data} options={options} className={className} />;
 };

@@ -4,7 +4,6 @@ import {
   Layers,
   LayoutDashboard,
   LogOut,
-  Logs,
   UsersRound,
 } from "lucide-react";
 
@@ -14,8 +13,8 @@ export default function Sidebar() {
       <div className="flex flex-col justify-between h-full">
         <div className="flex flex-col gap-8">
           <div className="border-b-[1px] border-gray-500/30 py-4">
-            <h1 className="text-blue-500 text-lg font-semibold">
-              Super Market
+            <h1 className="text-blue-500 text-lg font-semibold text-center">
+              Procurement Management System
             </h1>
           </div>
           <div>
@@ -39,7 +38,7 @@ export default function Sidebar() {
               </li>
               <li>
                 <a
-                  href="items"
+                  href="categories"
                   className="flex items-center gap-4 hover:bg-blue-500 hover:text-white p-3 rounded-md"
                 >
                   <ChartBarStacked />
@@ -48,7 +47,7 @@ export default function Sidebar() {
               </li>
               <li>
                 <a
-                  href="items"
+                  href="departments"
                   className="flex items-center gap-4 hover:bg-blue-500 hover:text-white p-3 rounded-md"
                 >
                   <BuildingIcon />
@@ -57,20 +56,11 @@ export default function Sidebar() {
               </li>
               <li>
                 <a
-                  href="items"
-                  className="flex items-center gap-4 hover:bg-blue-500 hover:text-white p-3 rounded-md"
-                >
-                  <Logs />
-                  Logs
-                </a>
-              </li>
-              <li>
-                <a
-                  href="items"
+                  href="staff"
                   className="flex items-center gap-4 hover:bg-blue-500 hover:text-white p-3 rounded-md"
                 >
                   <UsersRound />
-                  Users
+                  Staff
                 </a>
               </li>
             </ul>

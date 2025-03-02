@@ -5,7 +5,7 @@ import BarChart from "../components/barchart";
 
 export default function Dashboard() {
   const [employees, _setEmployees] = useState([]);
-  const [salaryData, _setSalaryData] = useState<{
+  const [itemData, _setItemData] = useState<{
     labels: string[];
     values: number[];
   }>({
@@ -15,7 +15,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchEmployees();
-    fetchSalaryData();
+    fetchItemData();
   }, []);
 
   const fetchEmployees = async () => {
@@ -27,30 +27,48 @@ export default function Dashboard() {
     }
   };
 
-  const fetchSalaryData = async () => {
+  const fetchItemData = async () => {
     try {
-      //   const data = await getMonthlySalaryTotals();
-      // Prepare the data for the chart
-      // const labels = [
-      //   "January",
-      //   "February",
-      //   "March",
-      //   "April",
-      //   "May",
-      //   "June",
-      //   "July",
-      //   "August",
-      //   "September",
-      //   "October",
-      //   "November",
-      //   "December",
-      // ];
-      //   setSalaryData({
-      //     labels,
-      //     // values: data.monthlySalaries,
-      //   });
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/v1/items/chart-data"
+      );
+      const result = await response.json();
+
+      if (response.ok) {
+        const labels = [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
+        ];
+
+        // Mapping received data to match labels
+        const values = labels.map((month) => {
+          const found = result.data.labels.find((date: string) =>
+            date.includes(month)
+          );
+          return found
+            ? result.data.values[result.data.labels.indexOf(found)]
+            : 0;
+        });
+
+        console.log(itemData);
+        console.log(result);
+
+        _setItemData({ labels, values });
+      } else {
+        console.error("Failed to fetch data:", result.error);
+      }
     } catch (error) {
-      console.error("Failed to fetch monthly salary data:", error);
+      console.error("Failed to fetch item data:", error);
     }
   };
 
@@ -121,7 +139,7 @@ export default function Dashboard() {
           <div className="bg-white rounded-md w-full shadow-md shadow-blue-300 flex justify-center p-4">
             <BarChart
               className={"min-w-[300px] min-h-[300px]"}
-              salaryData={salaryData}
+              itemData={itemData}
             />
           </div>
           <div className="">
