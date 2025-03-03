@@ -5,7 +5,7 @@ import { FaMedal } from "react-icons/fa";
 
 import { Edit3, Trash2 } from "lucide-react";
 import Popup from "../components/popup";
-import { DepartmentsTypes } from "../../types";
+import { API_BASE_URL, DepartmentsTypes } from "../../types";
 import { MoreModal } from "../components/more_modal";
 import { useEffect, useState } from "react";
 
@@ -37,15 +37,12 @@ export default function Departments() {
 
   const fetchDepartments = async () => {
     try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/v1/departments/",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/departments/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       const data = await response.json();
       if (response.ok) {
         setDepartments(data.data); // <-- Ensure Departments state is updated
@@ -60,16 +57,13 @@ export default function Departments() {
 
   const handleAddDepartment = async () => {
     try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/v1/departments/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newDepartment), // <-- Send new Department data
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/departments/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newDepartment), // <-- Send new Department data
+      });
 
       const data = await response.json();
       if (response.ok) {
@@ -104,7 +98,7 @@ export default function Departments() {
 
     try {
       const getDepartmentResponse = await fetch(
-        `http://127.0.0.1:8000/api/v1/departments/id=${id}`,
+        `${API_BASE_URL}/departments/id=${id}`,
         {
           method: "GET",
           headers: {
@@ -133,7 +127,7 @@ export default function Departments() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/v1/departments/id=${currentDepartmentId}`,
+        `${API_BASE_URL}/departments/id=${currentDepartmentId}`,
         {
           method: "PUT",
           headers: {
@@ -174,7 +168,7 @@ export default function Departments() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/v1/departments/id=${departmentToDelete}`,
+        `${API_BASE_URL}/departments/id=${departmentToDelete}`,
         {
           method: "DELETE",
           headers: {

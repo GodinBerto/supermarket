@@ -5,7 +5,7 @@ import { FaMedal } from "react-icons/fa";
 
 import { Edit3, Trash2 } from "lucide-react";
 import Popup from "../components/popup";
-import { DepartmentsTypes, StaffTypes } from "../../types";
+import { API_BASE_URL, DepartmentsTypes, StaffTypes } from "../../types";
 import { MoreModal } from "../components/more_modal";
 import { useEffect, useState } from "react";
 
@@ -35,7 +35,7 @@ export default function Staff() {
 
   const fetchStaff = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/staffs/", {
+      const response = await fetch(`${API_BASE_URL}/staffs/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +55,7 @@ export default function Staff() {
 
   const handleAddStaff = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/staffs/", {
+      const response = await fetch(`${API_BASE_URL}/staffs/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -92,15 +92,12 @@ export default function Staff() {
     }
 
     try {
-      const getStaffResponse = await fetch(
-        `http://127.0.0.1:8000/api/v1/staffs/id=${id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const getStaffResponse = await fetch(`${API_BASE_URL}/staffs/id=${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       const dataFetched = await getStaffResponse.json();
 
@@ -122,7 +119,7 @@ export default function Staff() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/v1/staffs/id=${currentStaffId}`,
+        `${API_BASE_URL}/staffs/id=${currentStaffId}`,
         {
           method: "PUT",
           headers: {
@@ -163,7 +160,7 @@ export default function Staff() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/v1/staffs/id=${staffToDelete}`,
+        `${API_BASE_URL}/staffs/id=${staffToDelete}`,
         {
           method: "DELETE",
           headers: {
@@ -374,15 +371,12 @@ function Medal({
 
   const fetchDepartments = async () => {
     try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/v1/departments/",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/departments/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       const data = await response.json();
       if (response.ok) {
         setDepartments(data.data); // <-- Ensure Departments state is updated

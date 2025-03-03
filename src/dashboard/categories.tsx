@@ -5,7 +5,7 @@ import { FaMedal } from "react-icons/fa";
 
 import { Edit3, Trash2 } from "lucide-react";
 import Popup from "../components/popup";
-import { CategoriesTypes } from "../../types";
+import { API_BASE_URL, CategoriesTypes } from "../../types";
 import { MoreModal } from "../components/more_modal";
 import { useEffect, useState } from "react";
 
@@ -34,7 +34,7 @@ export default function Categories() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/categories/", {
+      const response = await fetch(`${API_BASE_URL}/categories/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -54,7 +54,7 @@ export default function Categories() {
 
   const handleAddcategory = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/categories/", {
+      const response = await fetch(`${API_BASE_URL}/categories/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -95,7 +95,7 @@ export default function Categories() {
 
     try {
       const getcategoryResponse = await fetch(
-        `http://127.0.0.1:8000/api/v1/categories/id=${id}`,
+        `${API_BASE_URL}/categories/id=${id}`,
         {
           method: "GET",
           headers: {
@@ -124,7 +124,7 @@ export default function Categories() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/v1/categories/id=${currentCategoryId}`,
+        `${API_BASE_URL}/categories/id=${currentCategoryId}`,
         {
           method: "PUT",
           headers: {
@@ -165,7 +165,7 @@ export default function Categories() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/v1/categories/id=${categoryToDelete}`,
+        `${API_BASE_URL}/categories/id=${categoryToDelete}`,
         {
           method: "DELETE",
           headers: {

@@ -78,7 +78,7 @@ const LineChart = ({ className, itemData }: any) => {
           display: false,
         },
         ticks: {
-          stepSize: 500, // Adjust based on your salary data range
+          stepSize: 1, // Adjust based on your salary data range
         },
       },
     },

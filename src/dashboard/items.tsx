@@ -5,7 +5,12 @@ import { FaMedal } from "react-icons/fa";
 
 import { Edit3, Trash2 } from "lucide-react";
 import Popup from "../components/popup";
-import { CategoriesTypes, DepartmentsTypes, ItemsTypes } from "../../types";
+import {
+  API_BASE_URL,
+  CategoriesTypes,
+  DepartmentsTypes,
+  ItemsTypes,
+} from "../../types";
 import { MoreModal } from "../components/more_modal";
 
 export default function Item() {
@@ -35,7 +40,7 @@ export default function Item() {
 
   const fetchItems = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/items/", {
+      const response = await fetch(`${API_BASE_URL}/items/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +60,7 @@ export default function Item() {
 
   const handleAdditem = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/items/", {
+      const response = await fetch(`${API_BASE_URL}/items/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -99,15 +104,12 @@ export default function Item() {
     }
 
     try {
-      const getItemResponse = await fetch(
-        `http://127.0.0.1:8000/api/v1/items/id=${id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const getItemResponse = await fetch(`${API_BASE_URL}/items/id=${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       const dataFetched = await getItemResponse.json();
 
@@ -129,7 +131,7 @@ export default function Item() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/v1/items/id=${currentItemId}`,
+        `${API_BASE_URL}/items/id=${currentItemId}`,
         {
           method: "PUT",
           headers: {
@@ -169,15 +171,12 @@ export default function Item() {
     }
 
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/api/v1/items/id=${itemToDelete}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/items/id=${itemToDelete}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (response.ok) {
         setItems((prevItems) =>
@@ -391,15 +390,12 @@ function Medal({
 
   const fetchDepartments = async () => {
     try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/v1/departments/",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/departments/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       const data = await response.json();
       if (response.ok) {
         setDepartments(data.data); // <-- Ensure Departments state is updated
@@ -413,7 +409,7 @@ function Medal({
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/categories/", {
+      const response = await fetch(`${API_BASE_URL}/categories/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
